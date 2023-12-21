@@ -22,8 +22,6 @@ from llama_index.readers.file.markdown_reader import MarkdownReader
 # LangChain components to use
 from langchain.agents import Tool
 from langchain.document_loaders import TextLoader
-from langchain.schema import Document
-
 
 
 
@@ -68,44 +66,17 @@ def get_cleaned_file_names(documents):
         cleaned_file_name = base_file_name + '.txt'
     return cleaned_file_name
 
-def loadFile(required_ext):
-    """To extract the documents from the file"""
-
-    required_exts = [required_ext]
-    reader = SimpleDirectoryReader(
-        input_files=["./accentColor.mdx"],
-        # input_dir="./tailwindcss/src/pages/docs",
-        file_extractor={"mdx": MarkdownReader},
-        # required_exts=required_exts,
-        recursive=True
-    )
-    # print(reader.load())
-    return reader.load_data()
-
-    # reader1 = TextLoader("./accentColor.mdx")
-    # return reader1.load()
 
 def formatToEmbed(document):
-    """To convert the extracted documents into format that can be embedded.
-            1: for documenrts loaded using SimpleDirectoryReader from llama_index
-            2: Using Documents from Langchain Schema.
-    """
-    
+    """To convert the extracted documents into format that can be embedded."""
+
     toEmbed = []
     for doc in document:
         # print(doc.text)
         docToString = '"""' + doc.text + '"""'
         # toEmbed.append(doc.text)
         toEmbed.append(docToString)
-    print(toEmbed)
-    # return [docToString]
-    return toEmbed
-
-    # page_contents = [doc.page_content for doc in document]
-    # print(page_contents)
-    # return page_contents
-
-
+    return docToString
 
 
 def embedDocuments(documents):
@@ -120,6 +91,37 @@ def embedDocuments(documents):
     # print(response)
     print('Embeddings: {}'.format(response.embeddings))
     return response.embeddings
+
+
+def loadFile(required_ext):
+    """To extract the documents from the file"""
+
+    # required_exts = [required_ext]
+
+    # reader = SimpleDirectoryReader(
+    #     input_files=["./accentColor.mdx"],
+    #     # input_dir="./tailwindcss/src/pages/docs",
+    #     file_extractor={"mdx": MarkdownReader},
+    #     # required_exts=required_exts,
+    #     recursive=True
+    # )
+    # return reader.load_data()
+    docs = []
+    directory_path = "./"
+# Loop through each file in the directory
+    for filename in os.listdir(directory_path):
+        if filename.endswith(required_ext):
+            file_path = os.path.join(directory_path, filename)
+            
+            # Assuming your TextLoader class takes a file path as an argument
+            loader = TextLoader(file_path)
+            
+            # Load the document and append it to the docs list
+            document = loader.load()
+            docs.append(document[0])
+
+    return docs
+
 
 
 def prettyPrint(document):
@@ -159,13 +161,16 @@ def getTools(toolName,index):
 
 def main():
 
-    document = formatToEmbed(loadFile(".md"))
+    # document = formatToEmbed(loadFile(".md"))
     # prettyPrint(document=document)
     # print(document)
+    
+    docs = loadFile(".mdx")
+    # print(docs)
     # vectorEmbeddings = embedDocuments(document)
     # json_str = json.dumps(obj.to_json())
     # embedIntoAstra(json.dumps(document.to_json()))
-    embedIntoAstra(document,"")
+    embedIntoAstra(docs,"")
     # print(document)
     # embedIntoAstra(document,vectorEmbeddings)
 
