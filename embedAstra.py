@@ -64,7 +64,7 @@ def embedIntoAstra(documents, VectorEmbedding):
 
 
     # astra_vector_store.from_documents(documents=documents ,embedding=VectorEmbedding)
-    astra_vector_store.from_texts(documents=[documents])
+    astra_vector_store.add_texts([documents])
     # print(astra_vector_store.load_data())
 
     astra_vector_index = VectorStoreIndexWrapper(vectorstore=astra_vector_store)
