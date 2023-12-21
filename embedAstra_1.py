@@ -29,11 +29,11 @@ COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 #     model="embed-english-v3.0",
 #     cohere_api_key= os.getenv("COHERE_API_KEY")
 # )
-cohereEmbedModel = CohereEmbedding(
-    cohere_api_key=COHERE_API_KEY,
-    model_name="embed-english-v3.0",
-    input_type="search_query",
-)
+# cohereEmbedModel = CohereEmbedding(
+#     cohere_api_key=COHERE_API_KEY,
+#     model_name="embed-english-v3.0",
+#     input_type="search_query",
+# )
 
 cassio.init(token=ASTRA_DB_APPLICATION_TOKEN, database_id=ASTRA_DB_ID)
 
