@@ -1,0 +1,5 @@
+.env
+/venv
+/tailwindcss
+/accentColor.txt
+/__pycache__
