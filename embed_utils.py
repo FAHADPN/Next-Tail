@@ -21,6 +21,7 @@ from llama_index.readers.file.markdown_reader import MarkdownReader
 
 # LangChain components to use
 from langchain.agents import Tool
+from langchain.document_loaders import TextLoader
 
 
 
@@ -95,16 +96,32 @@ def embedDocuments(documents):
 def loadFile(required_ext):
     """To extract the documents from the file"""
 
-    required_exts = [required_ext]
+    # required_exts = [required_ext]
 
-    reader = SimpleDirectoryReader(
-        input_files=["./accentColor.mdx"],
-        # input_dir="./tailwindcss/src/pages/docs",
-        file_extractor={"mdx": MarkdownReader},
-        # required_exts=required_exts,
-        recursive=True
-    )
-    return reader.load_data()
+    # reader = SimpleDirectoryReader(
+    #     input_files=["./accentColor.mdx"],
+    #     # input_dir="./tailwindcss/src/pages/docs",
+    #     file_extractor={"mdx": MarkdownReader},
+    #     # required_exts=required_exts,
+    #     recursive=True
+    # )
+    # return reader.load_data()
+    docs = []
+    directory_path = "./"
+# Loop through each file in the directory
+    for filename in os.listdir(directory_path):
+        if filename.endswith(required_ext):
+            file_path = os.path.join(directory_path, filename)
+            
+            # Assuming your TextLoader class takes a file path as an argument
+            loader = TextLoader(file_path)
+            
+            # Load the document and append it to the docs list
+            document = loader.load()
+            docs.append(document[0])
+
+    return docs
+
 
 
 def prettyPrint(document):
@@ -144,13 +161,16 @@ def getTools(toolName,index):
 
 def main():
 
-    document = formatToEmbed(loadFile(".md"))
+    # document = formatToEmbed(loadFile(".md"))
     # prettyPrint(document=document)
-    print(document)
+    # print(document)
+    
+    docs = loadFile(".mdx")
+    # print(docs)
     # vectorEmbeddings = embedDocuments(document)
     # json_str = json.dumps(obj.to_json())
     # embedIntoAstra(json.dumps(document.to_json()))
-    embedIntoAstra(document,"")
+    embedIntoAstra(docs,"")
     # print(document)
     # embedIntoAstra(document,vectorEmbeddings)
 
