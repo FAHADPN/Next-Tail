@@ -184,7 +184,7 @@ class UItoCode(APIView):
         print(request.data)
         
         # url = request.data['url']
-        url = "https://storage.googleapis.com/generativeai-downloads/data/scene.jpg"
+        url = "https://next-tail-space.blr1.digitaloceanspaces.com/next-tail/images/website.jpg"
         if request.data['message'] == '':
             chat = generate_code(url,'Send a greetings message for me and ask me to ask you a question to continue a conversation')
         else:
