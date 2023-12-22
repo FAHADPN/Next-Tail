@@ -73,7 +73,7 @@
       <script>
         let controller; // AbortController to stop the streaming
         const chatOutput = $("#tailwind");
-        const userInput = $("#css");
+        const userInput = $("#prompt");
         const htmlPreview = $("#html-preview");
         var html="";
         //console.log(userInput);
@@ -93,7 +93,7 @@
             const response = await fetch(url, {
               method: "POST",
               headers: {
-                "Content-Type": "multipart/form-data",
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({ message: userInput.val() }),
               signal: controller.signal, // Attach the AbortSignal to the fetch request
@@ -164,7 +164,7 @@
           htmlPreview.empty();
             // Send user's message as a POST request
             startStreaming(
-              '{%url "UItoCodeai"%}',
+              '{%url "ui"%}',
               onDataReceived,
               onError,
               onComplete

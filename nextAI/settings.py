@@ -32,6 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', None)
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', None)
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -98,10 +99,19 @@ WSGI_APPLICATION = "nextAI.wsgi.application"
 #     }
 # }
 
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "True") == "True"
 
 if DEVELOPMENT_MODE is True:
-    pass
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'db',
+            'USER' : 'db',
+            'PASSWORD': 'AVNS_eqswZBjS-fYpD2siF3v',
+            'HOST': 'app-8a9a60a5-c468-4068-bd4a-a75e6ae2989d-do-user-14807016-0.c.db.ondigitalocean.com',
+            'PORT': '25060'
+        }
+    }
 elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
     if os.getenv("DATABASE_URL", None) is None:
         raise Exception("DATABASE_URL environment variable not defined")
@@ -150,17 +160,18 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),]
+# STATICFILES_DIRS = [
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_LOCATION = 'next-tail'
+AWS_S3_ENDPOINT_URL = 'https://blr1.digitaloceanspaces.com'
 
+#     os.path.join(BASE_DIR, 'static'),
 # ]
 # STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-# STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 MEDIA_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, 'media')
