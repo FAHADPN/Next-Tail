@@ -147,7 +147,7 @@
         </div>`)
         // Send user's message as a POST request
         startStreaming(
-            '{%url "generate_stream"%}',
+            '{%url "nextAI"%}',
             onDataReceived,
             onError,
             onComplete
@@ -157,14 +157,6 @@
             // Display the user's message in the chat
       }
     });
-
-    // Simulate starting the streaming when the page loads
-    //startStream(
-    // '{%url "generate_stream"%}',
-    //  onDataReceived,
-    //  onError,
-    //  onComplete
-    //);
   </script>
 </body>
 

@@ -28,12 +28,9 @@ ASTRA_DB_ID = os.getenv("ASTRA_DB_ID")
 ASTRA_DB_API_ENDPOINT = os.getenv("ASTRA_DB_API_ENDPOINT")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
-# SECRET_KEY = os.getenv('SECRET_KEY')
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
-
-
-SECRET_KEY = "django-insecure-)g!q&^i(jga##9^v_yrl84x^lqh0a0@iug3@@43e&n_rzdapcs"
+SECRET_KEY = os.getenv('SECRET_KEY')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', None)
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -104,16 +101,7 @@ WSGI_APPLICATION = "nextAI.wsgi.application"
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
 if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'genai',
-            'USER' : 'postgres',
-            'PASSWORD': 'Ynot4me?',
-            'HOST': 'localhost',
-            'PORT': '5432'
-        }
-    }
+    pass
 elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
     if os.getenv("DATABASE_URL", None) is None:
         raise Exception("DATABASE_URL environment variable not defined")
@@ -161,19 +149,18 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),]
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-AWS_S3_ENDPOINT_URL = 'https://blr1.digitaloceanspaces.com'
 AWS_LOCATION = 'next-tail'
 
-
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
 # ]
 # STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, AWS_LOCATION)
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 MEDIA_URL = 'https://%s/%s/' % (AWS_S3_ENDPOINT_URL, 'media')
