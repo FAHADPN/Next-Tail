@@ -49,4 +49,14 @@ class StreamGeneratorView(APIView):
 class HomeView(View):
 
     def get(self,request):
+        return render(request,'index.html')
+    
+class cssToTailwindView(View):
+
+    def get(self,request):
         return render(request,'tailwind_conversion.html')
+    
+class nextAIView(View):
+
+    def get(self,request):
+        return render(request,'next.html')
