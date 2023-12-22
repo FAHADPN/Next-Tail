@@ -1,0 +1,21 @@
+AWS_ACCESS_KEY_ID = DO00DRTKKFNWF7Z4YT8T
+AWS_SECRET_ACCESS_KEY = V5P9/lxrAiAvkA4MMcFvwNGe31Q57ciqGbF0GCUu2JI
+AWS_STORAGE_BUCKET_NAME = next-tail-space
+AWS_S3_ENDPOINT_URL = https://blr1.digitaloceanspaces.com
+
+ASTRA_DB_APPLICATION_TOKEN = AstraCS:CMcgpGCCZrgNARPHoxbsukoZ:fc09db353780c81378b3896ed8278d2cf8ad2b9eccb0284bdc63bac3abaf7e3c
+ASTRA_DB_CLIENT_ID =  CMcgpGCCZrgNARPHoxbsukoZ
+ASTRA_DB_SECRET = Ztl9XFszg7DE,n5wSCr08mmd_kc2WNHf5GrrwRTGOSr7_EZTsMiEIZj5-wm9bB,KSlyoWqMHUH+kHbJRHyhLZ1owXsATYiOwWhZF-Ezi5zJFSBKteZwcWbFlXqYawxlX
+ASTRA_DB_ID = d1bf7050-1617-4de5-ae1f-05f3f06809c3
+ASTRA_DB_API_ENDPOINT = https://d1bf7050-1617-4de5-ae1f-05f3f06809c3-us-east-2.apps.astra.datastax.com
+GOOGLE_API_KEY = AIzaSyAZskhE6J9-Df_dlrLfnC3gKWcNYpOKtgM
+COHERE_API_KEY = AuCDyKXWVfZquTnIhoJZ5xTuPADvlVsZnOTQ6fdt
+SECRET_KEY = 'django-insecure-)g!q&^i(jga##9^v_yrl84x^lqh0a0@iug3@@43e&n_rzdapcs'
+
+
+# ASTRA_DB_API_ENDPOINT = "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/d1bf7050-1617-4de5-ae1f-05f3f06809c3-1/secure-connect-next-tail.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76S2JCB77W%2F20231221%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20231221T102205Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=fb7253c940b54466708392531cdc1640237d61a4fd7abaff3dc524badd66b1f6"
+# https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/d1bf7050-1617-4de5-ae1f-05f3f06809c3-1/secure-connect-next-tail.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76S2JCB77W%2F20231221%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20231221T085929Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=8b137fb8466479d8960711131e7b1e5abb13f662e92d16646dde5b92b1473490
+
+# co = cohere.Client("AuCDyKXWVfZquTnIhoJZ5xTuPADvlVsZnOTQ6fdt")
+
+

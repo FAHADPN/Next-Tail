@@ -1,19 +1,4 @@
-from django.shortcuts import render
-import time
-from rest_framework.views import APIView
-# from rest_framework.renderers import JSONRenderer
-# from rest_framework.response import Response
-from django.views.generic import View  
-from django.shortcuts import render
-from django.http import StreamingHttpResponse
-from rest_framework import status
-from openai import OpenAI  # for OpenAI API calls
-import time  # for measuring time duration of API calls
 import os
-from django.conf import settings
-#--------------------------------------------------
-# AI PART
-#--------------------------------------------------
 from dotenv import load_dotenv
 
 import cohere
@@ -25,14 +10,9 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnableMap
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.indexes.vectorstore import VectorStoreIndexWrapper
-from .nextTail import gemini_Chain
-from .multiModalDemo import generate_code
-from .models import image
 
 import google.generativeai as genai
-import environ
-env = environ.Env()
-
+from django.conf import settings
 
 ASTRA_DB_APPLICATION_TOKEN = settings.ASTRA_DB_APPLICATION_TOKEN
 ASTRA_DB_ID = settings.ASTRA_DB_ID
@@ -62,7 +42,7 @@ def get_retriever(question):
 
     cohereEmbedModel = CohereEmbeddings(
         model="embed-english-v3.0",
-        cohere_api_key=COHERE_API_KEY
+        cohere_api_key=os.getenv("COHERE_API_KEY")
     )
 
     astra_vector_store = AstraDB(
@@ -120,7 +100,6 @@ def get_prompt_template():
 def gemini_Chain(question):
 
     Gemini_llm = ChatGoogleGenerativeAI(
-        google_api_key=GOOGLE_API_KEY,
         model="gemini-pro",
         temperature=0.3,
         convert_system_message_to_human=True)
@@ -151,92 +130,19 @@ def gemini_Chain(question):
     for r in res:
         yield r
 
-#--------------------------------------------------
-        # Gemini CSS to Tailwind Converter
-#--------------------------------------------------
-class Gemini(APIView):
-    # Vector DB already loaded.(Already indexed)
-    # Get the vectors from the DB (using Retriever)
-    def main_test():
+def main():
 
-        """To run the main code run : gemini_Chain()"""
-        gemini_Chain(question="What is Tailwind ?")
+    """To run the main code run : gemini_Chain()"""
+    gemini_Chain(question="""Can you give tailwind for this CSS : background-image: linear-gradient(
+		135deg,
+		rgba(#752e7c, 0.35),
+		rgba(#734a58, 0.1) 15%,
+		#1b2028 20%,
+		#1b2028 100% """)
 
-        """To check if reranker is wokriing run get_retriever"""
-        # get_retriever()
-    
-    def post(self,request):
-        print(request.data)
-        if request.data['message'] == '':
-            chat = gemini_Chain(question='Send a greetings message for me and ask me to ask you a question to continue a conversation')
-        else:
-            chat = gemini_Chain(question=request.data['message'])
-        response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
-        return response
-    
-#--------------------------------------------------
-        # UI to Code
-#--------------------------------------------------
+    """To check if reranker is wokriing run get_retriever"""
+    # get_retriever()
 
-class UItoCode(APIView):
 
-    def post(self,request):
-        print(request.data)
-        
-        # url = request.data['url']
-        url = "https://storage.googleapis.com/generativeai-downloads/data/scene.jpg"
-        if request.data['message'] == '':
-            chat = generate_code(url,'Send a greetings message for me and ask me to ask you a question to continue a conversation')
-        else:
-            chat = generate_code(url,request.data['message'])
-        response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
-        return response
-
-# -------------------------------------------------- 
-# --------------------------------------------------    
-# client = OpenAI(
-#     api_key='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',
-# )
-
-# class StreamGeneratorView(APIView):
-
-#     def openaichatter(self,message):
-
-#         stream = client.chat.completions.create(
-#             model="gpt-4",
-#             messages=[{"role": "user", "content":message}],
-#             stream=True,
-#         )
-
-#         print("here")
-#         for chunk in stream:
-#             yield chunk.choices[0].delta.content or ""
-    
-#     def post(self,request):
-#         print(request.data)
-#         if request.data['message'] == '':
-#             chat = self.openaichatter('Send a greetings message for me and ask me to ask you a question to continue a conversation')
-#         else:
-#             chat = self.openaichatter(request.data['message'])
-#         response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
-#         return response
-
-class HomeView(View):
-
-    def get(self,request):
-        return render(request,'index.html')
-    
-class cssToTailwindView(View):
-
-    def get(self,request):
-        return render(request,'tailwind_conversion.html')
-    
-class nextAIView(View):
-
-    def get(self,request):
-        return render(request,'next.html')
-    
-class UItoCodeView(View):
-
-    def get(self,request):
-        return render(request,'ui_to_code.html')
+if __name__ == "__main__":
+    main()

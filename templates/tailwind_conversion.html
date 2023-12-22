@@ -51,7 +51,7 @@
         </div>
         <div class="form-control w-full">
             <label for="css">HTML Preview</label>
-        <div id="html-preview" class="w-full h-[50vh] border-2 border-gray-300 rounded-md"></div>
+        <div id="html-preview" class=" w-full h-[50vh] border-2 border-gray-300 rounded-md over"></div>
     </div>
         </div>
         <div class="flex w-full justify-end">
@@ -151,9 +151,10 @@
         $("#send_message").on("click", function () {
           const userMessage = userInput.val();
           htmlPreview.empty();
+          chatOutput.empty();
             // Send user's message as a POST request
             startStreaming(
-              '{%url "generate_stream"%}',
+              '{%url "gemini"%}',
               onDataReceived,
               onError,
               onComplete
