@@ -30,7 +30,7 @@ class StreamGeneratorView(APIView):
 
         stream = client.chat.completions.create(
             model="gpt-4",
-            messages=[{"role": "user", "content": "Convert the following css code to tailwind css code with proper html and classes:\n "+message}],
+            messages=[{"role": "user", "content": "Convert the following css code to tailwind css code with proper html and classes, Don't give any text give only the html code, don't add any comments in the code:\n "+message}],
             stream=True,
         )
 
