@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CSS to Tailwind</title>
+    <title>UI to Code</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,25 +21,25 @@
 
   <body>
     <header class="w-full flex items-center justify-center h-[20vh]">
-      <h1 class="font-bold text-5xl">CSS to Tailwind Converter</h1>
+      <h1 class="font-bold text-5xl">UI to Code</h1>
     </header>
     <section class="max-w-[1200px] mx-auto">
       <div class="flex flex-col w-full items-center justify-center">
         <div class="flex justify-center w-full gap-2">
           <div class="form-control w-full">
-            <label for="css">CSS</label>
-            <textarea
-              type="text"
+            <label for="css">UI</label>
+            <input
+              type="file"
               name="css"
               id="css"
-              cols="30"
-              rows="10"
+              cols="3"
+              rows="1"
               placeholder="Type the CSS here..."
-              class="w-full h-[50vh] resize-none border-2 border-gray-300 rounded-md p-2"
-            ></textarea>
+              class=" resize-none border-2 border-gray-300 rounded-md p-2"
+            >
           </div>
           <div class="form-control w-full">
-            <label for="css">Tailwind</label>
+            <label for="css">Code</label>
             <textarea
               name="tailwind"
               id="tailwind"

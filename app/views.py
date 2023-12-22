@@ -60,3 +60,8 @@ class nextAIView(View):
 
     def get(self,request):
         return render(request,'next.html')
+    
+class UItoCodeView(View):
+
+    def get(self,request):
+        return render(request,'ui_to_code.html')
