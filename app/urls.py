@@ -7,6 +7,7 @@ urlpatterns = [
     path('nextAI',views.nextAIView.as_view(),name='nextAI'),
     path('UItoCode',views.UItoCodeView.as_view(),name='ui_to_code'),
     path('ui',views.UItoCode.as_view(),name='ui'),
+    path("GeminiAPI", views.GeminiAPI.as_view(), name="gemini"),
     # path('generate-stream',views.StreamGeneratorView.as_view(),name='generate_stream'),
     path('gemini',views.GeminiAPI.as_view(),name='gemini'),
 
