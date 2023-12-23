@@ -99,25 +99,7 @@ WSGI_APPLICATION = "nextAI.wsgi.application"
 #     }
 # }
 
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "True") == "True"
 
-if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'db',
-            'USER' : 'db',
-            'PASSWORD': 'AVNS_eqswZBjS-fYpD2siF3v',
-            'HOST': 'app-8a9a60a5-c468-4068-bd4a-a75e6ae2989d-do-user-14807016-0.c.db.ondigitalocean.com',
-            'PORT': '25060'
-        }
-    }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if os.getenv("DATABASE_URL", None) is None:
-        raise Exception("DATABASE_URL environment variable not defined")
-    DATABASES = {
-        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
-    }
 
 
 # Password validation

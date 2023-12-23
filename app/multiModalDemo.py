@@ -21,13 +21,14 @@ def generate_code(img_url, prompt="Give tailwind CSS code for this image"):
     gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
     image_documents = load_image_urls(img_url)
 
+
     stream_complete_response = gemini_pro.stream_complete(
         prompt=prompt,
         image_documents=image_documents,
     )
 
     for r in stream_complete_response:
-        yield r
+        print(r.text, end="")
 
 
 def main():

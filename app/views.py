@@ -26,8 +26,7 @@ from langchain.schema.runnable import RunnableMap
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.indexes.vectorstore import VectorStoreIndexWrapper
 from .nextTail import gemini_Chain
-from .multiModalDemo import generate_code
-from .models import image
+# from .models import image
 import google.generativeai as genai
 from llama_index.multi_modal_llms.gemini import GeminiMultiModal
 from llama_index.multi_modal_llms.generic_utils import (
@@ -36,6 +35,8 @@ from llama_index.multi_modal_llms.generic_utils import (
 from PIL import Image
 from django.conf import settings
 import google.generativeai as genai
+
+from rest_framework.response import Response
 
 
 ASTRA_DB_APPLICATION_TOKEN = settings.ASTRA_DB_APPLICATION_TOKEN
@@ -160,25 +161,13 @@ def gemini_Chain(question):
 #--------------------------------------------------
 
 GOOGLE_API_KEY = settings.GOOGLE_API_KEY
-# os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
 
-def generate_code(img_url, prompt="Give tailwind CSS code for this image"):
 
-    gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
-    image_documents = load_image_urls(img_url)
-
-    stream_complete_response = gemini_pro.stream_complete(
-        prompt=prompt,
-        image_documents=image_documents,
-    )
-
-    for r in stream_complete_response:
-        yield r        
-
-class Gemini(APIView):
+class GeminiAPI(APIView):
     # Vector DB already loaded.(Already indexed)
     # Get the vectors from the DB (using Retriever)
     def main_test():
@@ -201,6 +190,98 @@ class Gemini(APIView):
 #--------------------------------------------------
         # UI to Code
 #--------------------------------------------------
+from io import BytesIO
+import requests
+
+def first ():
+    image_urls = [
+        "https://storage.googleapis.com/generativeai-downloads/data/scene.jpg",
+        "https://www.softservedweb.com/_next/image?url=http%3A%2F%2F128.199.22.214%2Fuploads%2Fchatgpt_ea8cd42076_83f28f8b57.png&w=640&q=75",
+        "https://www.softservedweb.com/_next/image?url=http%3A%2F%2F128.199.22.214%2Fuploads%2Fsocio_AI_abae5695af_dc9fd39a38.png&w=640&q=75",
+        "https://www.softservedweb.com/_next/image?url=http%3A%2F%2F128.199.22.214%2Fuploads%2FAihika_634ed5a8ee.png&w=640&q=75",
+        "https://www.softservedweb.com/_next/image?url=http%3A%2F%2F128.199.22.214%2Fuploads%2Fcult_88100bc876_e7509e2d58.png&w=640&q=75",
+        # Add yours here!
+    ]
+
+    image_documents = load_image_urls(image_urls)
+    gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
+    # import matplotlib.pyplot as plt
+
+    img_response = requests.get(image_urls[0])
+    print(image_urls[0])
+    img = Image.open(BytesIO(img_response.content))
+    # plt.imshow(img)
+
+    stream_complete_response = gemini_pro.stream_complete(
+        prompt="Give me more context for the images",
+        image_documents=image_documents,
+    )
+
+    for r in stream_complete_response:
+        print(r.text, end="")
+
+
+from llama_index.multi_modal_llms.gemini import GeminiMultiModal
+
+from llama_index.multi_modal_llms.generic_utils import (
+    load_image_urls,
+)
+
+from trulens_eval import TruCustomApp
+from trulens_eval import Tru
+from trulens_eval.tru_custom_app import instrument
+from trulens_eval import Provider
+from trulens_eval import Feedback
+from trulens_eval import Select
+from trulens_eval import TruCustomApp
+tru = Tru()
+tru.reset_database()
+gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
+
+# create a custom class to instrument
+class Gemini:
+    @instrument
+    def complete(self, prompt, image_documents):
+        completion = gemini_pro.stream_complete(
+            prompt=prompt,
+            image_documents=image_documents,
+        )
+        for r in completion:
+            yield r
+
+# create a custom gemini feedback provider
+class Gemini_Provider(Provider):
+    def city_rating(self, image_url) -> float:
+        image_documents = load_image_urls([image_url])
+        city_score = float(gemini_pro.complete(prompt = "Is this image of a UI? Respond with the float likelihood from 0.0 (not UI) to 1.0 (UI).",
+        image_documents=image_documents).text)
+        return city_score
+
+gemini_provider = Gemini_Provider()
+f_custom_function = Feedback(gemini_provider.city_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
+
+def ui_to_code(url,prompt="Convert this image into HTML and TAILWIND CSS code") :
+
+    image_urls = [
+        url
+        # Add yours here!
+    ]
+    print("prompt: ",prompt)
+    image_documents = load_image_urls(image_urls)
+    gemini = Gemini()
+
+    gemini_provider.city_rating(image_url=url)
+    tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
+
+    with tru_gemini as recording:
+        res = gemini.complete(
+        prompt=prompt,
+        image_documents=image_documents
+        )
+
+        
+        yield res
+        # tru.run_dashboard()
 
 class UItoCode(APIView):
 
@@ -208,43 +289,41 @@ class UItoCode(APIView):
         print(request.data)
         
         # url = request.data['url']
-        url = "https://next-tail-space.blr1.digitaloceanspaces.com/next-tail/images/website.jpg"
+        url = "https://assets-global.website-files.com/5e3de80322b300854230f11f/5eb57601ecdccf89b45dfba6_login-01-full-p-2000.jpeg"
+        image_urls = [
+            url
+            # Add yours here!
+        ]
+        prompt="Convert this image into HTML and TAILWIND CSS code"
+        print("prompt: ",prompt)
+        image_documents = load_image_urls(image_urls)
+        gemini = Gemini()
+
+        gemini_provider.city_rating(image_url=url)
+        tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
+
+        # with tru_gemini as recording:
+        #     res = gemini.complete(
+        #     prompt=prompt,
+        #     image_documents=image_documents
+        #     )
+        print(request.data)
         if request.data['message'] == '':
-            chat = generate_code(url,'Send a greetings message for me and ask me to ask you a question to continue a conversation')
+            chat = gemini.complete(
+            prompt=prompt,
+            image_documents=image_documents
+            )
         else:
-            chat = generate_code(url,request.data['message'])
+            chat = gemini.complete(
+            prompt=prompt+" & "+request.data['message'],
+            image_documents=image_documents
+            )
         response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
         return response
 
 # -------------------------------------------------- 
+    # View Class
 # --------------------------------------------------    
-# client = OpenAI(
-#     api_key='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',
-# )
-
-# class StreamGeneratorView(APIView):
-
-#     def openaichatter(self,message):
-
-#         stream = client.chat.completions.create(
-#             model="gpt-4",
-#             messages=[{"role": "user", "content":message}],
-#             stream=True,
-#         )
-
-#         print("here")
-#         for chunk in stream:
-#             yield chunk.choices[0].delta.content or ""
-    
-#     def post(self,request):
-#         print(request.data)
-#         if request.data['message'] == '':
-#             chat = self.openaichatter('Send a greetings message for me and ask me to ask you a question to continue a conversation')
-#         else:
-#             chat = self.openaichatter(request.data['message'])
-#         response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
-#         return response
-
 class HomeView(View):
 
     def get(self,request):
