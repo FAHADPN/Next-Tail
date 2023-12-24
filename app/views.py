@@ -10,6 +10,7 @@ from rest_framework import status
 from openai import OpenAI  # for OpenAI API calls
 import time  # for measuring time duration of API calls
 import os
+from .serializers import ImageSerializer
 from django.conf import settings
 #--------------------------------------------------
 # AI PART
@@ -25,7 +26,6 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnableMap
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.indexes.vectorstore import VectorStoreIndexWrapper
-from .nextTail import gemini_Chain
 # from .models import image
 import google.generativeai as genai
 from llama_index.multi_modal_llms.gemini import GeminiMultiModal
@@ -294,38 +294,37 @@ from llama_index.multi_modal_llms.generic_utils import (
     load_image_urls,
 )
 
-from trulens_eval import TruCustomApp
-from trulens_eval import Tru
-from trulens_eval.tru_custom_app import instrument
-from trulens_eval import Provider
-from trulens_eval import Feedback
-from trulens_eval import Select
-from trulens_eval import TruCustomApp
-tru = Tru()
-tru.reset_database()
+# from trulens_eval import TruCustomApp
+# from trulens_eval import Tru
+# from trulens_eval.tru_custom_app import instrument
+# from trulens_eval import Provider
+# from trulens_eval import Feedback
+# from trulens_eval import Select
+# from trulens_eval import TruCustomApp
+# tru = Tru()
+# tru.reset_database()
 gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
 
 # create a custom class to instrument
 class Gemini:
-    @instrument
+    # @instrument
     def complete(self, prompt, image_documents):
-        completion = gemini_pro.stream_complete(
+        completion = gemini_pro.complete(
             prompt=prompt,
             image_documents=image_documents,
         )
-        for r in completion:
-            yield r
+        return completion
 
 # create a custom gemini feedback provider
-class Gemini_Provider(Provider):
-    def city_rating(self, image_url) -> float:
-        image_documents = load_image_urls([image_url])
-        city_score = float(gemini_pro.complete(prompt = "Is this image of a UI? Respond with the float likelihood from 0.0 (not UI) to 1.0 (UI).",
-        image_documents=image_documents).text)
-        return city_score
+# class Gemini_Provider(Provider):
+#     def city_rating(self, image_url) -> float:
+#         image_documents = load_image_urls([image_url])
+#         city_score = float(gemini_pro.complete(prompt = "Is this image of a UI? Respond with the float likelihood from 0.0 (not UI) to 1.0 (UI).",
+#         image_documents=image_documents).text)
+#         return city_score
 
-gemini_provider = Gemini_Provider()
-f_custom_function = Feedback(gemini_provider.city_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
+# gemini_provider = Gemini_Provider()
+# f_custom_function = Feedback(gemini_provider.city_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
 
 def ui_to_code(url,prompt="Convert this image into HTML and TAILWIND CSS code") :
 
@@ -337,55 +336,60 @@ def ui_to_code(url,prompt="Convert this image into HTML and TAILWIND CSS code") 
     image_documents = load_image_urls(image_urls)
     gemini = Gemini()
 
-    gemini_provider.city_rating(image_url=url)
-    tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
+    # gemini_provider.city_rating(image_url=url)
+    # tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
 
-    with tru_gemini as recording:
-        res = gemini.complete(
-        prompt=prompt,
-        image_documents=image_documents
-        )
+    # with tru_gemini as recording:
+    res = gemini.complete(
+    prompt=prompt,
+    image_documents=image_documents
+    )
 
-        
-        yield res
+    
+    return res
         # tru.run_dashboard()
 
 class UItoCode(APIView):
 
     def post(self,request):
-        print(request.data)
+        serializer = ImageSerializer(data=request.data)
+        image_urls = []
         
-        # url = request.data['url']
-        url = "https://assets-global.website-files.com/5e3de80322b300854230f11f/5eb57601ecdccf89b45dfba6_login-01-full-p-2000.jpeg"
-        image_urls = [
-            url
-            # Add yours here!
-        ]
-        prompt="Convert this image into HTML and TAILWIND CSS code"
-        print("prompt: ",prompt)
-        image_documents = load_image_urls(image_urls)
-        gemini = Gemini()
+        if serializer.is_valid():
+            # Save the image to the model
+            saved_image = serializer.save()
+            image_urls.append(saved_image.image.url)
+            print(image_urls)
 
-        gemini_provider.city_rating(image_url=url)
-        tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
+            # image_urls.append('https://blr1.digitaloceanspaces.com/next-tail-space/next-tail/images/website-232.jpg?AWSAccessKeyId=DO00DRTKKFNWF7Z4YT8T&Signature=Pgq1seOVRm8WUNjVRoz9%2BqaFQ1M%3D&Expires=1703442581')
+            prompt="Convert this image into HTML and TAILWIND CSS code"
+            # print("prompt: ",prompt)
+            image_documents = load_image_urls(image_urls)
+            gemini = Gemini()
 
-        # with tru_gemini as recording:
-        #     res = gemini.complete(
-        #     prompt=prompt,
-        #     image_documents=image_documents
-        #     )
-        print(request.data)
-        if request.data['message'] == '':
-            chat = gemini.complete(
-            prompt=prompt,
-            image_documents=image_documents
-            )
+            # gemini_provider.city_rating(image_url=url)
+            # tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
+
+            # with tru_gemini as recording:
+            #     res = gemini.complete(
+            #     prompt=prompt,
+            #     image_documents=image_documents
+            #     )
+            print(image_urls)
+            if serializer.validated_data['prompt'] == '':
+                chat = gemini.complete(
+                prompt=prompt,
+                image_documents=image_documents
+                )
+            else:
+                chat = gemini.complete(
+                prompt=prompt+" & "+serializer.validated_data['prompt'],
+                image_documents=image_documents
+                )
+            print(chat)
+            response =  Response(chat,status=200)
         else:
-            chat = gemini.complete(
-            prompt=prompt+" & "+request.data['message'],
-            image_documents=image_documents
-            )
-        response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
+            response = Response("Invalid data", status=status.HTTP_200_OK)
         return response
 
 # -------------------------------------------------- 

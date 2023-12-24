@@ -77,46 +77,46 @@
         const htmlPreview = $("#html-preview");
         var html="";
         //console.log(userInput);
-        console.log("not so good");
+        //console.log("not so good");
         //var idCount = 0;
   
-        function justDoIt() {
-          console.log("just do it");
-        }
-        async function startStreaming(url, onDataReceived, onError, onComplete) {
+        async function startStreaming(url,onDataReceived, onError, onComplete) {
             controller = new AbortController();
           //const receivedMessage = `<div class="chat-message received"><p class="message-content" id="${idCount}"></p></div>`;
           //chatOutput.append(receivedMessage);
           //idCount++;
+          const formData = new FormData();
+          const fileInput = $("#css")[0].files[0];
+          formData.append("image", fileInput);
+          formData.append("prompt", userInput.val() ? userInput.val() : "website");
+
+          console.log(formData.get("prompt"));
+            
           try {
-            console.log(userInput.val());
-            const response = await fetch(url, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ message: userInput.val() }),
-              signal: controller.signal, // Attach the AbortSignal to the fetch request
+            
+            fetch(url, {
+                method: "POST",
+                body: formData,
+                contentType: false, // Don't set content type (will be automatically set)
+                processData: false, // Don't process data (FormData will handle it)
+                signal: controller.signal, // Attach the AbortSignal to the fetch request
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json(); // or .text() if the response is text
+            })
+            .then(data => {
+                // Handle the data from the response
+                console.log(data[0][1]);
+                chatOutput.text(`${data[0][1]}`);
+                htmlPreview.append(data[0][1]);
+            })
+            .catch(error => {
+                // Handle the error
+                console.error('There was a problem with the fetch operation: ', error);
             });
-            console.log("i'm in");
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-  
-            const reader = response.body.getReader();
-  
-            while (true) {
-              const { done, value } = await reader.read();
-  
-              if (done) {
-                // The stream has ended
-                onComplete();
-                break;
-              }
-  
-              // Process the data chunk
-              onDataReceived(value);
-            }
           } catch (error) {
             onError(error);
           }
@@ -136,15 +136,15 @@
   
         function onDataReceived(dataChunk) {
           // Process each data chunk as it arrives
-          const text = new TextDecoder().decode(dataChunk);
-          const letters = text.split("");
+          //const text = new TextDecoder().decode(dataChunk);
+          //const letters = text.split("");
           //const ids = idCount - 1;
           //const chat = $(`#${ids}`);
-          letters.forEach((letter) => {
-            chatOutput.append(`${letter}`);
-            html+=letter;
+          //letters.forEach((letter) => {
+            chatOutput.append(dataChunk);
+            //html+=letter;
             chatOutput.scrollTop(chatOutput.prop("scrollHeight"));
-          });
+          //});
         }
   
         function onError(error) {
@@ -160,16 +160,15 @@
         }
   
         $("#send_message").on("click", function () {
-          const userMessage = userInput.val();
+
           htmlPreview.empty();
           chatOutput.empty();
-          console.log("i'm in");
             // Send user's message as a POST request
             startStreaming(
               '{%url "ui"%}',
               onDataReceived,
               onError,
-              onComplete
+              onComplete,
             );
   
             //userInput.val(""); // Clear the input field
