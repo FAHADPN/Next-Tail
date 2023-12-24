@@ -186,7 +186,74 @@ class GeminiAPI(APIView):
             chat = gemini_Chain(question=request.data['message'])
         response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
         return response
-    
+
+#--------------------------------------------------
+    #Next Tail LLM
+#--------------------------------------------------
+
+def next_Tail_llm_prompt_template():
+    """ Prompt Template from Langchain
+        with context and question. Can change to give dfferent format output
+    """
+
+    template = """You are an experienced senior TAILWIND-CSS developer, recognized for my efficiency in building websites and converting plain CSS into TAILWIND-CSS code. 
+    Your expertise extends to NEXT JS development as well. You are eager to assist anyone with any TAILWIND-CSS related inquiries or tasks others may have.
+    The context to answer the questions:
+    {context}
+
+    Question: {question}
+    if the question is a greeting message, reply with a greeting message and ask me to ask you a question related to Nextjs and Tailwind to continue a conversation. Don't any introduction about me in the greeting message
+    """
+    prompt = ChatPromptTemplate.from_template(template)
+
+    return prompt
+
+def next_Tail_llm(question):
+
+    Gemini_llm = ChatGoogleGenerativeAI(
+        google_api_key=GOOGLE_API_KEY,
+        model="gemini-pro",
+        temperature=0.3,
+        convert_system_message_to_human=True)
+
+    """RETRIEVER WORKING - ✅"""
+    # print(astra_retriever.get_relevant_documents("what is Tailwind?"))
+    # astra_retriever.get_relevant_documents("what is Tailwind?")
+
+    """RERANK THE RETREIVED DOCUEMENTS WORKING - ✅"""
+    # use cohere reranker
+
+    """PROMPT WORKING - ✅"""
+    gemini_prompt = next_Tail_llm_prompt_template()
+
+    """OUTPUT PARSER WORKING - ✅"""
+    output_parser = StrOutputParser()
+
+    """If reranker working add the OP of rereanker in context.
+        As of now it is the top n from relevant documnets.
+    """
+    # print(reranked)
+    chain = RunnableMap({
+        "context": lambda x: get_retriever(x["question"]),
+        "question": lambda x: x["question"]
+    }) | gemini_prompt | Gemini_llm | output_parser
+
+    res = chain.stream({"question": question})
+    for r in res:
+        yield r
+
+
+class NextTailLLM(APIView):
+
+    def post(self,request):
+        print(request.data)
+        if request.data['message'] == '':
+            chat = next_Tail_llm(question='Send a greetings message for me and ask me to ask you a question to continue a conversation')
+        else:
+            chat = next_Tail_llm(question=request.data['message'])
+        response =  StreamingHttpResponse(chat,status=200, content_type='text/event-stream')
+        return response
+
 #--------------------------------------------------
         # UI to Code
 #--------------------------------------------------

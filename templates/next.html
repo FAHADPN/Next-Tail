@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Next/Tailwind LLM</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -60,7 +61,7 @@
         <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
         <div>
             <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
-                <p class="text-sm" id="${idCount}"></p>
+                <div class="text-sm" id="${idCount}"></div>
             </div>
         </div>
     </div>`;
@@ -111,17 +112,24 @@
         controller = null;
       }
     }
+    function htmlDecode(input){
+        var doc = new DOMParser().parseFromString(input, "text/html");
+        return doc.documentElement.textContent;
+      }
 
     function onDataReceived(dataChunk) {
       // Process each data chunk as it arrives
       const text = new TextDecoder().decode(dataChunk);
-      const letters = text.split('');
+      const letters = text;
+      //console.log(letters);
       const ids = idCount-1;
-      const chat = $(`#${ids}`);
-      letters.forEach(letter => {
-        chat.append(`<span class="letter">${letter}</span>`);
-        chatOutput.scrollTop(chatOutput.prop("scrollHeight"));
-      });
+      const chat = document.getElementById(`${ids}`);
+      const decodedText = htmlDecode(marked.parse(letters))
+      console.log(decodedText);
+      chat.append(decodedText);
+      chatOutput.scrollTop(chatOutput.prop("scrollHeight"));
+      //letters.forEach(letter => {
+      //});
     }
 
     function onError(error) {
@@ -147,7 +155,7 @@
         </div>`)
         // Send user's message as a POST request
         startStreaming(
-            '{%url "GeminiAPI"%}',
+            '{%url "nexttail"%}',
             onDataReceived,
             onError,
             onComplete
