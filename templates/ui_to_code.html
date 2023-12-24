@@ -1,75 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UI to Code</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        /* font-family: 'Caveat', cursive; */
-        font-family: "Inter", sans-serif;
-      }
-    </style>
-  </head>
 
-  <body>
-    <header class="w-full flex items-center justify-center h-[20vh]">
-      <h1 class="font-bold text-5xl">UI to Code</h1>
-    </header>
-    <section class="max-w-[1200px] mx-auto">
-      <div class="flex flex-col w-full items-center justify-center">
-        <div class="flex justify-center w-full gap-2">
-          <div class="form-control w-full">
-            <label for="css">UI</label>
-            <input
-              type="file"
-              name="css"
-              id="css"
-              cols="3"
-              rows="1"
-              placeholder="Type the CSS here..."
-              class=" resize-none border-2 border-gray-300 rounded-md p-2"
-            >
-          </div>
-          <label for="prompt">Prompt</label>
-            <input
-              type="text"
-              name="prompt"
-              id="prompt"
-              cols="5"
-              rows="3"
-              placeholder="Type the prompt here..."
-              class=" resize-none border-2 border-gray-300 rounded-md p-2"
-            >
-          </div>
-          <div class="form-control w-full">
-            <label for="css">Code</label>
-            <textarea
-              name="tailwind"
-              id="tailwind"
-              cols="30"
-              rows="10"
-              placeholder="Tailwind will be generated here..."
-              class="w-full h-[50vh] resize-none border-2 border-gray-300 rounded-md p-2"
-            ></textarea>
-        </div>
-        <div class="form-control w-full">
-            <label for="css">HTML Preview</label>
-        <div id="html-preview" class="w-full h-[50vh] border-2 border-gray-300 rounded-md overflow-scroll"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI to Code</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    body {
+      /* font-family: 'Caveat', cursive; */
+      font-family: "Inter", sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="w-full px-10 py-10 flex items-center justify-center">
+    <div class="flex flex-col max-w-[1200px] w-full">
+      <h1 class="font-bold text-xl">UI to Code Converter</h1>
+      <p class="text-sm text-slate-500">Convert your ui design into code</p>
     </div>
+  </header>
+
+  <section class="max-w-[1200px] mx-auto flex items-center justify-center">
+    <div class="flex flex-col w-11/12 items-center justify-center">
+      <div class="flex justify-center w-full gap-2 flex-col items-center">
+
+        <div class="form-control flex flex-col w-full ">
+          <label for="css">UI</label>
+          <input type="file" name="css" id="css" class="border-2 border-gray-300 rounded-md p-2">
         </div>
-        <div class="flex w-full justify-end">
-        <button name="send_message" id="send_message" class="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Convert</button>
+
+        <div class="form-control flex flex-col w-full">
+          <label for="prompt">Prompt</label>
+          <input type="text" name="prompt" id="prompt" cols="5" rows="3" placeholder="Type the prompt here..."
+            class=" resize-none border-2 border-gray-300 rounded-md p-2">
         </div>
+        <button name="send_message" id="send_message"
+          class="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded w-full md:w-fit self-end">
+          Convert
+        </button>
       </div>
-      <script src="https://code.jquery.com/jquery-latest.js"></script>
+
+      <div class="form-control w-full">
+        <label for="css">Code</label>
+        <textarea name="tailwind" id="tailwind" cols="30" rows="10" placeholder="Tailwind will be generated here..."
+          class="w-full h-[50vh] resize-none border-2 border-gray-300 rounded-md p-2"></textarea>
+      </div>
+      <div class="form-control w-full mb-10">
+        <label for="css">HTML Preview</label>
+        <div id="html-preview" class="w-full h-[50vh] border-2 border-gray-300 rounded-md overflow-scroll"></div>
+      </div>
+    </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
       <script>
         let controller; // AbortController to stop the streaming
         const chatOutput = $("#tailwind");
@@ -109,7 +99,6 @@
             })
             .then(data => {
                 // Handle the data from the response
-                console.log(data[0][1]);
                 chatOutput.text(`${data[0][1]}`);
                 htmlPreview.append(data[0][1]);
             })
@@ -176,6 +165,7 @@
           });
   
       </script>
-    </section>
-  </body>
+  </section>
+</body>
+
 </html>
