@@ -16,22 +16,29 @@
       /* font-family: 'Caveat', cursive; */
       font-family: "Inter", sans-serif;
     }
+
+    ::-webkit-scrollbar {
+      width: 0;
+    }
   </style>
 </head>
 
 <body>
-  <header class="w-full flex items-center justify-center h-[20vh]">
-    <h1 class="font-bold text-5xl">CSS to Tailwind Converter</h1>
+  <header class="w-full px-10 pt-10 flex items-center justify-center">
+    <div class="flex flex-col max-w-[1200px] w-full">
+      <h1 class="font-bold text-xl">CSS to Tailwind Converter</h1>
+      <p class="text-sm text-slate-500">Convert your normal css styles into tailwind classnames</p>
+    </div>
   </header>
-  <section class="max-w-[1200px] mx-auto">
+  <section class="max-w-[1300px] mx-auto px-10 py-4 rounded-md my-10">
     <div class="flex flex-col w-full items-center justify-center">
-      <div class="flex justify-center w-full gap-2">
-        <div class="form-control w-full">
+      <div class="flex justify-center w-full gap-1 flex-wrap md:flex-nowrap">
+        <div class="form-control w-full md:w-1/2">
           <label for="css">CSS</label>
           <textarea type="text" name="css" id="css" cols="30" rows="10" placeholder="Type the CSS here..."
             class="w-full h-[50vh] resize-none border-2 border-gray-300 rounded-md p-2"></textarea>
         </div>
-        <div class="form-control w-full">
+        <div class="form-control w-full md:w-1/2">
           <label for="css">Tailwind</label>
           <textarea name="tailwind" id="tailwind" cols="30" rows="10" placeholder="Tailwind will be generated here..."
             class="w-full h-[50vh] resize-none border-2 border-gray-300 rounded-md p-2"></textarea>
@@ -40,9 +47,9 @@
     </div>
     <div class="flex w-full justify-end">
       <button name="send_message" id="send_message"
-        class="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Convert</button>
+        class="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded w-full md:w-fit">Convert</button>
     </div>
-    <div class="form-control w-full">
+    <div class="form-control w-full scro">
       <label for="css">HTML Preview</label>
       <div id="html-preview" class=" w-full h-[50vh] border-2 border-gray-300 rounded-md overflow-scroll"></div>
     </div>
