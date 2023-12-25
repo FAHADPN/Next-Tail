@@ -294,15 +294,15 @@ from llama_index.multi_modal_llms.generic_utils import (
     load_image_urls,
 )
 
-# from trulens_eval import TruCustomApp
-# from trulens_eval import Tru
-# from trulens_eval.tru_custom_app import instrument
-# from trulens_eval import Provider
-# from trulens_eval import Feedback
-# from trulens_eval import Select
-# from trulens_eval import TruCustomApp
-# tru = Tru()
-# tru.reset_database()
+from trulens_eval import TruCustomApp
+from trulens_eval import Tru
+from trulens_eval.tru_custom_app import instrument
+from trulens_eval import Provider
+from trulens_eval import Feedback
+from trulens_eval import Select
+from trulens_eval import TruCustomApp
+tru = Tru()
+tru.reset_database()
 gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
 
 # create a custom class to instrument
@@ -316,15 +316,15 @@ class Gemini:
         return completion
 
 # create a custom gemini feedback provider
-# class Gemini_Provider(Provider):
-#     def city_rating(self, image_url) -> float:
-#         image_documents = load_image_urls([image_url])
-#         city_score = float(gemini_pro.complete(prompt = "Is this image of a UI? Respond with the float likelihood from 0.0 (not UI) to 1.0 (UI).",
-#         image_documents=image_documents).text)
-#         return city_score
+class Gemini_Provider(Provider):
+    def city_rating(self, image_url) -> float:
+        image_documents = load_image_urls([image_url])
+        city_score = float(gemini_pro.complete(prompt = "Is this image of a UI? Respond with the float likelihood from 0.0 (not UI) to 1.0 (UI).",
+        image_documents=image_documents).text)
+        return city_score
 
-# gemini_provider = Gemini_Provider()
-# f_custom_function = Feedback(gemini_provider.city_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
+gemini_provider = Gemini_Provider()
+f_custom_function = Feedback(gemini_provider.city_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
 
 def ui_to_code(url,prompt="Convert this image into HTML and TAILWIND CSS code") :
 
@@ -369,26 +369,31 @@ class UItoCode(APIView):
             image_documents = load_image_urls(image_urls)
             gemini = Gemini()
 
-            # gemini_provider.city_rating(image_url=url)
-            # tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
+            
+            gemini_provider.UI_rating(image_url=image_urls[0])
+            tru_gemini = TruCustomApp(gemini, app_id = "gemini", feedbacks = [f_custom_function])
 
-            # with tru_gemini as recording:
-            #     res = gemini.complete(
-            #     prompt=prompt,
-            #     image_documents=image_documents
-            #     )
-            print(image_urls)
-            if serializer.validated_data['prompt'] == '':
-                chat = gemini.complete(
-                prompt=prompt,
-                image_documents=image_documents
-                )
-            else:
-                chat = gemini.complete(
-                prompt=prompt+" & "+serializer.validated_data['prompt'],
-                image_documents=image_documents
-                )
-            print(chat)
+            with tru_gemini as recording:
+
+                """Return or yield this 'res'
+                """
+
+             
+                # print(recording)
+                # print("TRU GEMINI >>>>>>>> \n", tru_gemini)
+                print(image_urls)
+                if serializer.validated_data['prompt'] == '':
+                    chat = gemini.complete(
+                    prompt=prompt,
+                    image_documents=image_documents
+                    )
+                else:
+                    chat = gemini.complete(
+                    prompt=prompt+" & "+serializer.validated_data['prompt'],
+                    image_documents=image_documents
+                    )
+                print(chat)
+                print("TrueLens Eval:\n------------\n",tru.get_leaderboard(app_ids = ["gemini"]))
             response =  Response(chat,status=200)
         else:
             response = Response("Invalid data", status=status.HTTP_200_OK)
