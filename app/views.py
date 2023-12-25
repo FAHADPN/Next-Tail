@@ -307,7 +307,7 @@ gemini_pro = GeminiMultiModal(model_name="models/gemini-pro-vision")
 
 # create a custom class to instrument
 class Gemini:
-    # @instrument
+    @instrument
     def complete(self, prompt, image_documents):
         completion = gemini_pro.complete(
             prompt=prompt,
@@ -317,14 +317,14 @@ class Gemini:
 
 # create a custom gemini feedback provider
 class Gemini_Provider(Provider):
-    def city_rating(self, image_url) -> float:
+    def UI_rating(self, image_url) -> float:
         image_documents = load_image_urls([image_url])
         city_score = float(gemini_pro.complete(prompt = "Is this image of a UI? Respond with the float likelihood from 0.0 (not UI) to 1.0 (UI).",
         image_documents=image_documents).text)
         return city_score
 
 gemini_provider = Gemini_Provider()
-f_custom_function = Feedback(gemini_provider.city_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
+f_custom_function = Feedback(gemini_provider.UI_rating, name = "UI Understandability").on(Select.Record.calls[0].args.image_documents[0].image_url)
 
 def ui_to_code(url,prompt="Convert this image into HTML and TAILWIND CSS code") :
 
@@ -393,7 +393,8 @@ class UItoCode(APIView):
                     image_documents=image_documents
                     )
                 print(chat)
-                print("TrueLens Eval:\n------------\n",tru.get_leaderboard(app_ids = ["gemini"]))
+
+            print("TrueLens Eval:\n------------\n",tru.get_leaderboard(app_ids = ["gemini"]))
             response =  Response(chat,status=200)
         else:
             response = Response("Invalid data", status=status.HTTP_200_OK)
