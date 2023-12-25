@@ -352,17 +352,19 @@ def ui_to_code(url,prompt="Convert this image into HTML and TAILWIND CSS code") 
 class UItoCode(APIView):
 
     def post(self,request):
+        print("hello")
         serializer = ImageSerializer(data=request.data)
         image_urls = []
         
         if serializer.is_valid():
             # Save the image to the model
+            print(serializer.validated_data)
             saved_image = serializer.save()
             image_urls.append(saved_image.image.url)
             print(image_urls)
 
             # image_urls.append('https://blr1.digitaloceanspaces.com/next-tail-space/next-tail/images/website-232.jpg?AWSAccessKeyId=DO00DRTKKFNWF7Z4YT8T&Signature=Pgq1seOVRm8WUNjVRoz9%2BqaFQ1M%3D&Expires=1703442581')
-            prompt="Convert this image into HTML and TAILWIND CSS code"
+            prompt="Convert this image into HTML using TAILWIND CSS code as cdn"
             # print("prompt: ",prompt)
             image_documents = load_image_urls(image_urls)
             gemini = Gemini()
